@@ -686,7 +686,7 @@ function RhythmGame({
 
       const masterGain = audio.createGain();
       masterGain.gain.setValueAtTime(0.0001, now);
-      masterGain.gain.exponentialRampToValueAtTime(0.05, now + 0.015);
+      masterGain.gain.exponentialRampToValueAtTime(0.15, now + 0.015);
       masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
       masterGain.connect(audio.destination);
 
