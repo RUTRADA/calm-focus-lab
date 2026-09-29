@@ -204,7 +204,7 @@ return (
 export default function App() {
 const initial = useMemo(loadSavedData, []);
 
-const [screen, setScreen] = useState("home");
+const [screen, navigate] = useState("home");
 const [settings, setSettings] = useState(initial.settings);
 const [progress, setProgress] = useState(initial.progress);
 
@@ -217,9 +217,83 @@ initial.progress.pattern || 1
 const [showSettings, setShowSettings] = useState(false);
 const [pausedFrom, setPausedFrom] = useState("home");
 
+const historyReadyRef = useRef(false);
+
+function navigate(nextScreen, extraState = {}) {
+  const nextState = {
+    screen: nextScreen,
+    rhythmLevel: selectedRhythmLevel,
+    rhythmStage: selectedRhythmStage,
+    patternStage: selectedPatternStage,
+    pausedFrom,
+    ...extraState,
+  };
+
+  window.history.pushState(nextState, "", window.location.href);
+  navigate(nextScreen);
+}
+
+function goBack() {
+  if (window.history.state?.screen) {
+    window.history.back();
+  } else {
+    navigate("home");
+  }
+}
+
 useEffect(() => {
 saveData(settings, progress);
 }, [settings, progress]);
+
+useEffect(() => {
+  if (!historyReadyRef.current) {
+    window.history.replaceState(
+      {
+        screen: "home",
+        rhythmLevel: selectedRhythmLevel,
+        rhythmStage: selectedRhythmStage,
+        patternStage: selectedPatternStage,
+      },
+      "",
+      window.location.href
+    );
+
+    historyReadyRef.current = true;
+  }
+
+  function handlePopState(event) {
+    const state = event.state;
+
+    if (!state || !state.screen) {
+      navigate("home");
+      return;
+    }
+
+    if (state.rhythmLevel) {
+      setSelectedRhythmLevel(state.rhythmLevel);
+    }
+
+    if (state.rhythmStage) {
+      setSelectedRhythmStage(state.rhythmStage);
+    }
+
+    if (state.patternStage) {
+      setSelectedPatternStage(state.patternStage);
+    }
+
+    if (state.pausedFrom) {
+      setPausedFrom(state.pausedFrom);
+    }
+
+    navigate(state.screen);
+  }
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, []);
 
 useEffect(() => {
 document.documentElement.dataset.fontSize = settings.fontSize;
@@ -235,29 +309,42 @@ setShowSettings(false);
 }
 
 function goHome() {
-  setScreen("home");
   closeSettings();
+  navigate("home");
 }
 
 function openRhythmLevel(levelKey) {
-setSelectedRhythmLevel(levelKey);
-setScreen("rhythm-stages");
+  setSelectedRhythmLevel(levelKey);
+
+  navigate("rhythm-stages", {
+    rhythmLevel: levelKey,
+  });
 }
 
 function openRhythmStage(levelKey, stage) {
-setSelectedRhythmLevel(levelKey);
-setSelectedRhythmStage(stage);
-setScreen("rhythm-game");
+  setSelectedRhythmLevel(levelKey);
+  setSelectedRhythmStage(stage);
+
+  navigate("rhythm-game", {
+    rhythmLevel: levelKey,
+    rhythmStage: stage,
+  });
 }
 
 function openPatternStage(stage) {
-setSelectedPatternStage(stage);
-setScreen("pattern-game");
+  setSelectedPatternStage(stage);
+
+  navigate("pattern-game", {
+    patternStage: stage,
+  });
 }
 
 function pause(from) {
-setPausedFrom(from);
-setScreen("pause");
+  setPausedFrom(from);
+
+  navigate("pause", {
+    pausedFrom: from,
+  });
 }
 
 function unlockRhythmNextStage(levelKey, stage) {
@@ -286,9 +373,9 @@ let page = null;
 if (screen === "home") {
 page = (
 <HomeScreen
-onChooseMode={() => setScreen("modes")}
-onProgress={() => setScreen("progress")}
-onHowTo={() => setScreen("how-to")}
+onChooseMode={() => navigate("modes")}
+onProgress={() => navigate("progress")}
+onHowTo={() => navigate("how-to")}
 onSettings={openSettings}
 />
 );
@@ -297,10 +384,10 @@ onSettings={openSettings}
 if (screen === "modes") {
 page = (
 <ModeSelectScreen
-onBack={goHome}
+onBack={goBack}
 onSettings={openSettings}
-onRhythm={() => setScreen("rhythm-levels")}
-onPattern={() => setScreen("pattern-start")}
+onRhythm={() => navigate("rhythm-levels")}
+onPattern={() => navigate("pattern-start")}
 />
 );
 }
@@ -309,7 +396,7 @@ if (screen === "rhythm-levels") {
 page = (
 <RhythmLevelScreen
 progress={progress}
-onBack={goHome}
+onBack={goBack}
 onSettings={openSettings}
 onChooseLevel={openRhythmLevel}
 />
@@ -321,7 +408,7 @@ page = (
 <RhythmStageScreen
 levelKey={selectedRhythmLevel}
 unlocked={progress.rhythm[selectedRhythmLevel]}
-onBack={() => setScreen("rhythm-levels")}
+onBack={() => navigate("rhythm-levels")}
 onSettings={openSettings}
 onChooseStage={(stage) =>
 openRhythmStage(selectedRhythmLevel, stage)
@@ -331,37 +418,37 @@ openRhythmStage(selectedRhythmLevel, stage)
 }
 
 if (screen === "rhythm-game") {
-page = (
-<RhythmGame
-key={`${selectedRhythmLevel}-${selectedRhythmStage}`}
-levelKey={selectedRhythmLevel}
-stage={selectedRhythmStage}
-settings={settings}
-onBack={() => setScreen("rhythm-stages")}
-onPause={() => pause("rhythm-game")}
-onSettings={openSettings}
-onPass={() =>
-unlockRhythmNextStage(selectedRhythmLevel, selectedRhythmStage)
-}
-onNext={() => {
-if (selectedRhythmStage < 20) {
-openRhythmStage(
-selectedRhythmLevel,
-selectedRhythmStage + 1
-);
-} else {
-setScreen("rhythm-stages");
-}
-}}
-/>
-);
+  page = (
+    <RhythmGame
+      key={`${selectedRhythmLevel}-${selectedRhythmStage}`}
+      levelKey={selectedRhythmLevel}
+      stage={selectedRhythmStage}
+      settings={settings}
+      onBack={goBack}
+      onPause={() => pause("rhythm-game")}
+      onSettings={openSettings}
+      onPass={() =>
+        unlockRhythmNextStage(selectedRhythmLevel, selectedRhythmStage)
+      }
+      onNext={() => {
+        if (selectedRhythmStage < 20) {
+          openRhythmStage(
+            selectedRhythmLevel,
+            selectedRhythmStage + 1
+          );
+        } else {
+          goBack();
+        }
+      }}
+    />
+  );
 }
 
 if (screen === "pattern-start") {
 page = (
 <PatternStartScreen
 progress={progress}
-onBack={() => setScreen("modes")}
+onBack={goBack}
 onSettings={openSettings}
 onContinue={() => openPatternStage(progress.pattern)}
 onChooseStage={openPatternStage}
@@ -370,54 +457,57 @@ onChooseStage={openPatternStage}
 }
 
 if (screen === "pattern-game") {
-page = (
-<PatternGame
-stage={selectedPatternStage}
-settings={settings}
-onBack={() => setScreen("pattern-start")}
-onPause={() => pause("pattern-game")}
-onSettings={openSettings}
-onPass={() => unlockPatternNextStage(selectedPatternStage)}
-onNext={() => {
-if (selectedPatternStage < 50) {
-openPatternStage(selectedPatternStage + 1);
-} else {
-setScreen("pattern-start");
-}
-}}
-/>
-);
+  page = (
+    <PatternGame
+      key={`pattern-${selectedPatternStage}`}
+      stage={selectedPatternStage}
+      settings={settings}
+      onBack={goBack}
+      onPause={() => pause("pattern-game")}
+      onSettings={openSettings}
+      onPass={() => unlockPatternNextStage(selectedPatternStage)}
+      onNext={() => {
+        if (selectedPatternStage < 50) {
+          openPatternStage(selectedPatternStage + 1);
+        } else {
+          goBack();
+        }
+      }}
+    />
+  );
 }
 
 if (screen === "progress") {
-page = (
-<ProgressScreen
-progress={progress}
-onBack={goHome}
-onSettings={openSettings}
-onRhythm={(levelKey) => openRhythmLevel(levelKey)}
-onPattern={() => openPatternStage(progress.pattern)}
-/>
-);
+  page = (
+    <ProgressScreen
+      progress={progress}
+      onBack={goBack}
+      onSettings={openSettings}
+      onRhythm={(levelKey) => openRhythmLevel(levelKey)}
+      onPattern={() => openPatternStage(progress.pattern)}
+    />
+  );
 }
 
 if (screen === "how-to") {
-page = (
-<HowToScreen
-onBack={goHome}
-onSettings={openSettings}
-/>
-);
+  page = (
+    <HowToScreen
+      onBack={goBack}
+      onSettings={openSettings}
+    />
+  );
 }
 
 if (screen === "pause") {
-page = (
-<PauseScreen
-onResume={() => setScreen(pausedFrom)}
-onHome={goHome}
-onSettings={openSettings}
-/>
-);
+  page = (
+    <PauseScreen
+      onResume={() => {
+        navigate(pausedFrom);
+      }}
+      onHome={goHome}
+      onSettings={openSettings}
+    />
+  );
 }
 
 return (
