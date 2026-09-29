@@ -225,18 +225,6 @@ useEffect(() => {
 document.documentElement.dataset.fontSize = settings.fontSize;
 }, [settings]);
 
-function navigate(nextScreen, stateData = {}) {
-  window.history.pushState(
-    {
-      screen: nextScreen,
-      ...stateData,
-    },
-    "",
-    window.location.href
-  );
-
-  setScreen(nextScreen);
-}
 
 function openSettings() {
 setShowSettings(true);
@@ -247,8 +235,8 @@ setShowSettings(false);
 }
 
 function goHome() {
+  setScreen("home");
   closeSettings();
-  navigate("home");
 }
 
 function openRhythmLevel(levelKey) {
@@ -309,7 +297,7 @@ onSettings={openSettings}
 if (screen === "modes") {
 page = (
 <ModeSelectScreen
-onBack={goBack}
+onBack={goHome}
 onSettings={openSettings}
 onRhythm={() => setScreen("rhythm-levels")}
 onPattern={() => setScreen("pattern-start")}
@@ -321,7 +309,7 @@ if (screen === "rhythm-levels") {
 page = (
 <RhythmLevelScreen
 progress={progress}
-onBack={goBack}
+onBack={goHome}
 onSettings={openSettings}
 onChooseLevel={openRhythmLevel}
 />
