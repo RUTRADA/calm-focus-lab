@@ -681,7 +681,7 @@ onChooseLevel,
 }) {
 return (
 <section className="screen">
-<TopBar title="จังหวะนิ่ง" onBack={onBack} onSettings={onSettings} />
+<TopBar title="Tempo" onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow">
 <div className="title-block">
@@ -732,7 +732,7 @@ const level = RHYTHM_LEVELS[levelKey];
 return (
 <section className="screen">
 <TopBar
-title={`จังหวะนิ่ง · ${level.title}`}
+title={`Tempo · ${level.title}`}
 onBack={onBack}
 onSettings={onSettings}
 />
@@ -1081,7 +1081,7 @@ function RhythmGame({
           <div className="start-stage-card">
             <div className="start-stage-symbol">◌</div>
 
-            <p className="eyebrow">จังหวะนิ่ง</p>
+            <p className="eyebrow">Tempo</p>
             <h2>พร้อมเริ่มเมื่อคุณต้องการ</h2>
 
             <p className="muted">
@@ -1101,7 +1101,7 @@ function RhythmGame({
         ) : (
           <>
             <div className="game-intro">
-              <p className="eyebrow">จังหวะนิ่ง</p>
+              <p className="eyebrow">Tempo</p>
               <h2>แตะเมื่อวงแหวนตรงกับเส้น</h2>
               <p className="muted">ค่อย ๆ ดู แล้วแตะเมื่อพร้อม</p>
             </div>
@@ -1168,7 +1168,7 @@ onChooseStage,
 }) {
 return (
 <section className="screen">
-<TopBar title="รหัสแสง" onBack={onBack} onSettings={onSettings} />
+<TopBar title="Memo" onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow">
 <div className="title-block">
@@ -1354,7 +1354,7 @@ if (result) {
 return (
 <section className="screen game-screen">
 <TopBar
-title={`รหัสแสง · ด่าน ${stage} จาก 50`}
+title={`Memo · ด่าน ${stage} จาก 50`}
 onBack={onBack}
 onPause={onPause}
 onSettings={onSettings}
@@ -1486,7 +1486,7 @@ onSettings={onSettings}
 <div className="progress-card-title">
 <span className="small-icon">◌</span>
 <div>
-<strong>จังหวะนิ่ง</strong>
+<strong>Tempo</strong>
 <small>เลือกระดับเพื่อกลับไปฝึก</small>
 </div>
 </div>
@@ -1503,7 +1503,7 @@ onSettings={onSettings}
 <div className="progress-card-title">
 <span className="small-icon">▦</span>
 <div>
-<strong>รหัสแสง</strong>
+<strong>Memo</strong>
 <small>เล่นต่อจากด่านล่าสุดได้</small>
 </div>
 </div>
@@ -1533,7 +1533,7 @@ return (
 
 <div>
 <p className="eyebrow">โหมด 1</p>
-<h2>จังหวะนิ่ง</h2>
+<h2>Tempo</h2>
 <ol>
 <li>ดูวงแหวนที่ค่อย ๆ ขยาย</li>
 <li>รอให้วงแหวนตรงกับเส้นเป้าหมาย</li>
@@ -1552,7 +1552,7 @@ return (
 
 <div>
 <p className="eyebrow">โหมด 2</p>
-<h2>รหัสแสง</h2>
+<h2>Memo</h2>
 <ol>
 <li>กด “เริ่มดูรหัส”</li>
 <li>ดูปุ่มที่สว่างทีละปุ่มจนจบ</li>
@@ -1617,7 +1617,7 @@ return (
 
 <SettingRow
 label="เสียงตอบรับ"
-description="เสียงสั้น ๆ เมื่อแตะใกล้จังหวะในโหมดจังหวะนิ่ง"
+description="เสียงสั้น ๆ เมื่อแตะใกล้จังหวะในโหมดTempo"
 >
 <Toggle
 checked={settings.feedbackSound}
@@ -1641,8 +1641,8 @@ onChange={(event) => update("fontSize", event.target.value)}
 </SettingRow>
 
 <SettingRow
-label="ความเร็วรหัสแสง"
-description="ความเร็วที่ปุ่มสว่างในโหมดรหัสแสง"
+label="ความเร็วMemo"
+description="ความเร็วที่ปุ่มสว่างในโหมดMemo"
 >
 <select
 value={settings.patternSpeed}
