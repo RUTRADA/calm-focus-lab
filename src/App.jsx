@@ -1,6 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_KEY = "calm-focus-game-v2";
+const APP_HISTORY_KEY = "calm-focus-lab-route";
+const APP_SCREENS = new Set([
+  "home",
+  "modes",
+  "progress",
+  "how-to",
+  "rhythm-levels",
+  "rhythm-stages",
+  "rhythm-game",
+  "pattern-start",
+  "pattern-game",
+  "pause",
+]);
+
+function isAppRoute(route) {
+  return route?.appId === APP_HISTORY_KEY && APP_SCREENS.has(route.screen);
+}
 
 const DEFAULT_SETTINGS = {
 feedbackSound: false,
@@ -203,89 +220,126 @@ return (
 
 export default function App() {
 const initial = useMemo(loadSavedData, []);
+const initialRoute = useMemo(() => {
+  const route = window.history.state;
 
-const [screen, navigate] = useState("home");
+  return {
+    appId: APP_HISTORY_KEY,
+    screen: "home",
+    rhythmLevel: "beginner",
+    rhythmStage: 1,
+    patternStage: initial.progress.pattern || 1,
+    pausedFrom: "home",
+    previous: null,
+    ...(isAppRoute(route) ? route : {}),
+  };
+}, [initial]);
+
+const [screen, setScreen] = useState(initialRoute.screen);
 const [settings, setSettings] = useState(initial.settings);
 const [progress, setProgress] = useState(initial.progress);
 
-const [selectedRhythmLevel, setSelectedRhythmLevel] = useState("beginner");
-const [selectedRhythmStage, setSelectedRhythmStage] = useState(1);
+const [selectedRhythmLevel, setSelectedRhythmLevel] = useState(
+  initialRoute.rhythmLevel
+);
+const [selectedRhythmStage, setSelectedRhythmStage] = useState(
+  initialRoute.rhythmStage
+);
 const [selectedPatternStage, setSelectedPatternStage] = useState(
-initial.progress.pattern || 1
+  initialRoute.patternStage
 );
 
 const [showSettings, setShowSettings] = useState(false);
-const [pausedFrom, setPausedFrom] = useState("home");
+const [pausedFrom, setPausedFrom] = useState(initialRoute.pausedFrom);
 
-const historyReadyRef = useRef(false);
-
-function navigate(nextScreen, extraState = {}) {
-  const nextState = {
-    screen: nextScreen,
+function getCurrentRoute() {
+  return {
+    appId: APP_HISTORY_KEY,
+    screen,
     rhythmLevel: selectedRhythmLevel,
     rhythmStage: selectedRhythmStage,
     patternStage: selectedPatternStage,
     pausedFrom,
+  };
+}
+
+const applyRoute = useCallback((route) => {
+  if (!isAppRoute(route)) return;
+
+  setScreen(route.screen);
+  setSelectedRhythmLevel(route.rhythmLevel || "beginner");
+  setSelectedRhythmStage(route.rhythmStage || 1);
+  setSelectedPatternStage(route.patternStage || initial.progress.pattern || 1);
+  setPausedFrom(route.pausedFrom || "home");
+}, [initial.progress.pattern]);
+
+function navigate(nextScreen, extraState = {}, replace = false) {
+  const currentRoute = getCurrentRoute();
+  const nextRoute = {
+    ...currentRoute,
     ...extraState,
+    appId: APP_HISTORY_KEY,
+    screen: nextScreen,
+    previous: replace
+      ? window.history.state?.previous || null
+      : currentRoute,
   };
 
-  window.history.pushState(nextState, "", window.location.href);
-  navigate(nextScreen);
+  if (replace) {
+    window.history.replaceState(nextRoute, "", window.location.href);
+  } else {
+    window.history.pushState(nextRoute, "", window.location.href);
+  }
+
+  applyRoute(nextRoute);
 }
 
 function goBack() {
-  if (window.history.state?.screen) {
+  const currentRoute = window.history.state;
+
+  if (isAppRoute(currentRoute?.previous)) {
     window.history.back();
-  } else {
-    navigate("home");
+    return;
   }
+
+  const parentScreen = {
+    modes: "home",
+    progress: "home",
+    "how-to": "home",
+    "rhythm-levels": "modes",
+    "rhythm-stages": "rhythm-levels",
+    "rhythm-game": "rhythm-stages",
+    "pattern-start": "modes",
+    "pattern-game": "pattern-start",
+    pause: pausedFrom,
+  }[screen] || "home";
+
+  navigate(parentScreen, {}, true);
 }
+
+function resumePausedScreen() {
+  const previousRoute = window.history.state?.previous;
+
+  if (isAppRoute(previousRoute) && previousRoute.screen === pausedFrom) {
+    window.history.back();
+    return;
+  }
+
+  navigate(pausedFrom, {}, true);
+}
+
 
 useEffect(() => {
 saveData(settings, progress);
 }, [settings, progress]);
 
 useEffect(() => {
-  if (!historyReadyRef.current) {
-    window.history.replaceState(
-      {
-        screen: "home",
-        rhythmLevel: selectedRhythmLevel,
-        rhythmStage: selectedRhythmStage,
-        patternStage: selectedPatternStage,
-      },
-      "",
-      window.location.href
-    );
-
-    historyReadyRef.current = true;
+  if (!isAppRoute(window.history.state)) {
+    window.history.replaceState(initialRoute, "", window.location.href);
   }
 
   function handlePopState(event) {
-    const state = event.state;
-
-    if (!state || !state.screen) {
-      navigate("home");
-      return;
-    }
-
-    if (state.rhythmLevel) {
-      setSelectedRhythmLevel(state.rhythmLevel);
-    }
-
-    if (state.rhythmStage) {
-      setSelectedRhythmStage(state.rhythmStage);
-    }
-
-    if (state.patternStage) {
-      setSelectedPatternStage(state.patternStage);
-    }
-
-    if (state.pausedFrom) {
-      setPausedFrom(state.pausedFrom);
-    }
-
-    navigate(state.screen);
+    applyRoute(event.state);
   }
 
   window.addEventListener("popstate", handlePopState);
@@ -293,7 +347,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener("popstate", handlePopState);
   };
-}, []);
+}, [applyRoute, initialRoute]);
 
 useEffect(() => {
 document.documentElement.dataset.fontSize = settings.fontSize;
@@ -408,7 +462,7 @@ page = (
 <RhythmStageScreen
 levelKey={selectedRhythmLevel}
 unlocked={progress.rhythm[selectedRhythmLevel]}
-onBack={() => navigate("rhythm-levels")}
+onBack={goBack}
 onSettings={openSettings}
 onChooseStage={(stage) =>
 openRhythmStage(selectedRhythmLevel, stage)
@@ -501,9 +555,7 @@ if (screen === "how-to") {
 if (screen === "pause") {
   page = (
     <PauseScreen
-      onResume={() => {
-        navigate(pausedFrom);
-      }}
+      onResume={resumePausedScreen}
       onHome={goHome}
       onSettings={openSettings}
     />
