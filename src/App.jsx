@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import gameLogo from "./assets/LOGOTEMPOMEMO.png";
 
 const STORAGE_KEY = "calm-focus-game-v2";
 const APP_HISTORY_KEY = "calm-focus-lab-route";
@@ -581,19 +582,7 @@ function HomeScreen({ onChooseMode, onProgress, onHowTo, onSettings }) {
 return (
 <section className="screen home-screen">
 <div className="home-brand">
-<div className="brand-symbol">
-<span />
-<span />
-<span />
-</div>
-
-<p className="eyebrow"></p>
-<h1>TempoMemo</h1>
-<p className="muted">
-มินิเกมฝึกจังหวะและความจำ
-<br />
-
-</p>
+<img className="game-logo" src={gameLogo} alt="" />
 </div>
 
 <div className="home-menu">

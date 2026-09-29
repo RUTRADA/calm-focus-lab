@@ -74,7 +74,7 @@ padding: 10px 0 38px;
 display: flex;
 flex-direction: column;
 justify-content: center;
-gap: 38px;
+gap: 1px;
 width: min(100%, 540px);
 }
 
@@ -82,47 +82,14 @@ width: min(100%, 540px);
 text-align: center;
 }
 
-.brand-symbol {
-position: relative;
-width: 74px;
-height: 74px;
-margin: 0 auto 20px;
+.game-logo {
+display: block;
+width: min(100%, 500px);
+height: 300px;
+margin: 0 auto 4px;
+object-fit: contain;
 }
 
-.brand-symbol span {
-position: absolute;
-top: 50%;
-left: 50%;
-border: 2px solid #4e9ba1;
-border-radius: 50%;
-transform: translate(-50%, -50%);
-}
-
-.brand-symbol span:nth-child(1) {
-width: 24px;
-height: 24px;
-background: #74bdbd;
-}
-
-.brand-symbol span:nth-child(2) {
-width: 48px;
-height: 48px;
-opacity: 0.75;
-}
-
-.brand-symbol span:nth-child(3) {
-width: 72px;
-height: 72px;
-border-color: #a5d0cf;
-opacity: 0.7;
-}
-
-.home-brand h1 {
-margin: 8px 0;
-font-size: clamp(2.35rem, 8vw, 3.7rem);
-letter-spacing: -0.065em;
-line-height: 1.15;
-}
 
 .eyebrow {
 margin: 0;
