@@ -3,13 +3,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const STORAGE_KEY = "calm-focus-game-v2";
 
 const DEFAULT_SETTINGS = {
-music: false,
 feedbackSound: false,
-vibration: false,
-reduceMotion: false,
+showDetails: true,
 fontSize: "normal",
 patternSpeed: "normal",
-showDetails: true,
 };
 
 const DEFAULT_PROGRESS = {
@@ -226,8 +223,20 @@ saveData(settings, progress);
 
 useEffect(() => {
 document.documentElement.dataset.fontSize = settings.fontSize;
-document.documentElement.dataset.reduceMotion = String(settings.reduceMotion);
 }, [settings]);
+
+function navigate(nextScreen, stateData = {}) {
+  window.history.pushState(
+    {
+      screen: nextScreen,
+      ...stateData,
+    },
+    "",
+    window.location.href
+  );
+
+  setScreen(nextScreen);
+}
 
 function openSettings() {
 setShowSettings(true);
@@ -238,8 +247,8 @@ setShowSettings(false);
 }
 
 function goHome() {
-setScreen("home");
-closeSettings();
+  closeSettings();
+  navigate("home");
 }
 
 function openRhythmLevel(levelKey) {
@@ -300,7 +309,7 @@ onSettings={openSettings}
 if (screen === "modes") {
 page = (
 <ModeSelectScreen
-onBack={goHome}
+onBack={goBack}
 onSettings={openSettings}
 onRhythm={() => setScreen("rhythm-levels")}
 onPattern={() => setScreen("pattern-start")}
@@ -312,7 +321,7 @@ if (screen === "rhythm-levels") {
 page = (
 <RhythmLevelScreen
 progress={progress}
-onBack={() => setScreen("modes")}
+onBack={goBack}
 onSettings={openSettings}
 onChooseLevel={openRhythmLevel}
 />
@@ -651,6 +660,31 @@ function RhythmGame({
 
   const startTimeRef = useRef(Date.now());
 
+  const audioContextRef = useRef(null);
+
+  async function unlockAudio() {
+  try {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) return null;
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextClass();
+    }
+
+    const context = audioContextRef.current;
+
+    if (context.state === "suspended") {
+      await context.resume();
+    }
+
+    return context;
+  } catch {
+    return null;
+  }
+}
+
   /*
     ถ้ายังไม่ได้เพิ่ม function getRhythmStageConfig
     โค้ดตรงนี้ก็ยังทำงานได้ เพราะมี config สำรอง
@@ -674,69 +708,59 @@ function RhythmGame({
     ? stageConfig.tolerance * 1.35
     : stageConfig.tolerance;
 
-  function playFeedbackTone(hitType) {
-    if (!settings.feedbackSound) return;
+  async function playFeedbackTone(hitType) {
+  if (!settings.feedbackSound) return;
 
-    try {
-      const AudioContextClass =
-        window.AudioContext || window.webkitAudioContext;
+  try {
+    const audio = await unlockAudio();
 
-      const audio = new AudioContextClass();
-      const now = audio.currentTime;
+    if (!audio) return;
 
-      const masterGain = audio.createGain();
-      masterGain.gain.setValueAtTime(0.0001, now);
-      masterGain.gain.exponentialRampToValueAtTime(0.15, now + 0.015);
-      masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-      masterGain.connect(audio.destination);
+    const now = audio.currentTime;
 
-      const notes =
-        hitType === "perfect"
-          ? [659.25, 783.99]
-          : hitType === "good"
-            ? [587.33]
-            : [392];
+    const masterGain = audio.createGain();
+    masterGain.connect(audio.destination);
 
-      notes.forEach((frequency, index) => {
-        const oscillator = audio.createOscillator();
-        const gain = audio.createGain();
+    masterGain.gain.setValueAtTime(0.0001, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.1, now + 0.018);
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
 
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(
-          frequency,
-          now + index * 0.055
-        );
+    const notes =
+      hitType === "perfect"
+        ? [659.25, 783.99]
+        : hitType === "good"
+          ? [587.33]
+          : [392];
 
-        gain.gain.setValueAtTime(0.0001, now + index * 0.055);
-        gain.gain.exponentialRampToValueAtTime(
-          hitType === "perfect" ? 0.045 : 0.03,
-          now + index * 0.055 + 0.012
-        );
-        gain.gain.exponentialRampToValueAtTime(
-          0.0001,
-          now + index * 0.055 + 0.22
-        );
+    notes.forEach((frequency, index) => {
+      const startAt = now + index * 0.07;
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
 
-        oscillator.connect(gain);
-        gain.connect(masterGain);
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(frequency, startAt);
 
-        oscillator.start(now + index * 0.055);
-        oscillator.stop(now + index * 0.055 + 0.24);
-      });
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(
+        hitType === "perfect" ? 0.085 : 0.065,
+        startAt + 0.018
+      );
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        startAt + 0.3
+      );
 
-      window.setTimeout(() => {
-        audio.close();
-      }, 500);
-    } catch {
-      // browser ไม่รองรับเสียงก็เล่นเกมต่อได้
-    }
+      oscillator.connect(gain);
+      gain.connect(masterGain);
+
+      oscillator.start(startAt);
+      oscillator.stop(startAt + 0.32);
+    });
+  } catch {
+    // เกมยังทำงานต่อได้แม้เสียงไม่รองรับ
   }
+}
 
-  function vibrate() {
-    if (settings.vibration && navigator.vibrate) {
-      navigator.vibrate(10);
-    }
-  }
 
   function resetStage(keepSlowMode = false) {
     setHasStarted(false);
@@ -752,6 +776,7 @@ function RhythmGame({
   }
 
   function startStage() {
+    unlockAudio();
     setBeat(1);
     setHits([]);
     setFeedback("รอให้วงแหวนตรงกับเส้น");
@@ -807,10 +832,8 @@ function RhythmGame({
 
     if (isPerfect) {
       playFeedbackTone("perfect");
-      vibrate();
     } else if (isGood) {
       playFeedbackTone("good");
-      vibrate();
     } else {
       playFeedbackTone("soft");
     }
@@ -1241,7 +1264,7 @@ if (phase === "wrong") instruction = "ลองดูรหัสอีกคร
 return (
 <section className="screen game-screen">
 <TopBar
-title={`รหัสแสง · ด่าน ${stage} จาก 50`}
+title={`Memo · ด่าน ${stage} จาก 50`}
 onBack={onBack}
 onPause={onPause}
 onSettings={onSettings}
@@ -1472,25 +1495,6 @@ onChange={(value) => update("feedbackSound", value)}
 />
 </SettingRow>
 
-<SettingRow
-label="การสั่น"
-description="ให้เครื่องสั่นเบา ๆ เมื่อแตะได้ใกล้จังหวะ"
->
-<Toggle
-checked={settings.vibration}
-onChange={(value) => update("vibration", value)}
-/>
-</SettingRow>
-
-<SettingRow
-label="ลดการเคลื่อนไหว"
-description="ลดเอฟเฟกต์เคลื่อนไหวที่ไม่จำเป็นในเมนู"
->
-<Toggle
-checked={settings.reduceMotion}
-onChange={(value) => update("reduceMotion", value)}
-/>
-</SettingRow>
 
 <SettingRow
 label="ขนาดตัวอักษร"
