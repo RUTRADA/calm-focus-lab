@@ -39,22 +39,22 @@ pattern: 1,
 const RHYTHM_LEVELS = {
 
 beginner: {
-title: "เริ่มต้น",
-detail: "จังหวะช้า · วงแหวนใหญ่",
+title: "Beginner",
+detail: "Slow pace · wide ring",
 duration: 3200,
 targetSize: 57,
 tolerance: 16,
 },
 medium: {
-title: "ฝึกต่อ",
-detail: "จังหวะปานกลาง · เป้าหมายแคบลง",
+title: "Intermediate",
+detail: "Moderate pace · tighter target",
 duration: 2400,
 targetSize: 57,
 tolerance: 11,
 },
 hard: {
-title: "ท้าทาย",
-detail: "จังหวะเร็วขึ้น · ต้องสังเกตมากขึ้น",
+title: "Challenge",
+detail: "Faster pace · sharper focus",
 duration: 1750,
 targetSize: 57,
 tolerance: 8,
@@ -199,7 +199,7 @@ function TopBar({ title, onBack, onPause, onSettings }) {
 return (
 <header className="topbar">
 <Button variant="ghost" onClick={onBack}>
-← กลับ
+← Back
 </Button>
 
 <h1 className="topbar-title">{title}</h1>
@@ -207,11 +207,11 @@ return (
 <div className="topbar-actions">
 {onPause && (
 <Button variant="ghost" onClick={onPause}>
-⏸ พัก
+⏸ Pause
 </Button>
 )}
 
-<Button variant="ghost" onClick={onSettings} aria-label="การตั้งค่า">
+<Button variant="ghost" onClick={onSettings} aria-label="Settings">
 ⚙
 </Button>
 </div>
@@ -588,25 +588,25 @@ return (
 <div className="home-menu">
 <Button className="home-main-button" onClick={onChooseMode}>
 <span className="button-icon">◌</span>
-เลือกโหมด
+Choose a Mode
 <span className="button-arrow">→</span>
 </Button>
 
 <Button variant="secondary" className="home-menu-button" onClick={onProgress}>
 <span className="button-icon">▤</span>
-ความคืบหน้าของฉัน
+My Progress
 <span className="button-arrow">→</span>
 </Button>
 
 <Button variant="secondary" className="home-menu-button" onClick={onHowTo}>
 <span className="button-icon">?</span>
-วิธีเล่น
+How to Play
 <span className="button-arrow">→</span>
 </Button>
 
 <Button variant="secondary" className="home-menu-button" onClick={onSettings}>
 <span className="button-icon">⚙</span>
-การตั้งค่า
+Settings
 <span className="button-arrow">→</span>
 </Button>
 </div>
@@ -617,13 +617,13 @@ return (
 function ModeSelectScreen({ onBack, onSettings, onRhythm, onPattern }) {
 return (
 <section className="screen">
-<TopBar title="เลือกโหมด" onBack={onBack} onSettings={onSettings} />
+<TopBar title="Choose a Mode" onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">เลือกกิจกรรม</p>
-<h2>วันนี้เล่นอะไรดีนะ?</h2>
-<p className="muted">เลือกโหมดที่รู้สึกสบายได้เลย</p>
+<p className="eyebrow">CHOOSE AN ACTIVITY</p>
+<h2>What would you like to play today?</h2>
+<p className="muted">Pick an activity that feels right.</p>
 </div>
 
 <button className="large-mode-card" onClick={onRhythm}>
@@ -635,8 +635,8 @@ return (
 
 <div className="mode-card-text">
 <strong>Tempo</strong>
-<small>แตะเมื่อวงแหวนตรงกับเส้น</small>
-<small className="mode-skill">ฝึกสมาธิ · การรอ · การกะจังหวะ</small>
+<small>Tap when the ring meets the target</small>
+<small className="mode-skill">Focus · patience · timing</small>
 </div>
 
 <span className="card-arrow">→</span>
@@ -651,8 +651,8 @@ return (
 
 <div className="mode-card-text">
 <strong>Memo</strong>
-<small>ดูแสงที่กะพริบเป็นรูปแบบ แล้วกดตามลำดับของรูปแบบที่แสดง</small>
-<small className="mode-skill">ฝึกความจำ · ลำดับ · การจดจ่อ</small>
+<small>Watch the sequence, then repeat it</small>
+<small className="mode-skill">Memory · sequencing · attention</small>
 </div>
 
 <span className="card-arrow">→</span>
@@ -674,12 +674,12 @@ return (
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">เลือกความเร็ว</p>
-<h2>อยากเริ่มจากแบบไหน?</h2>
+<p className="eyebrow">CHOOSE YOUR PACE</p>
+<h2>Where would you like to start?</h2>
 <p className="muted">
-ทุกระดับเลือกได้อิสระ
+Choose any level.
 <br />
-ภายในระดับจะค่อย ๆ เปิดด่านถัดไป
+Clear stages to unlock the next one.
 </p>
 </div>
 
@@ -698,7 +698,7 @@ onClick={() => onChooseLevel(key)}
 <div>
 <strong>{level.title}</strong>
 <small>{level.detail}</small>
-<small>เล่นถึงด่าน {progress.rhythm[key]} จาก 20</small>
+<small>Stage {progress.rhythm[key]} of 20</small>
 </div>
 
 <span className="card-arrow">→</span>
@@ -728,9 +728,9 @@ onSettings={onSettings}
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">เลือกด่าน</p>
-<h2>ฝึกตามจังหวะของคุณ</h2>
-<p className="muted">ด่านใหม่จะพร้อมเมื่อฝึกด่านก่อนหน้าเสร็จ</p>
+<p className="eyebrow">CHOOSE A STAGE</p>
+<h2>Practice at your own pace</h2>
+<p className="muted">Clear a stage to unlock the next one.</p>
 </div>
 
 <div className="stage-grid">
@@ -772,7 +772,7 @@ function RhythmGame({
   const [beat, setBeat] = useState(1);
   const [hits, setHits] = useState([]);
   const [feedback, setFeedback] = useState(
-    "กดเริ่มด่านเมื่อคุณพร้อม"
+    "Ready when you are"
   );
   const [result, setResult] = useState(null);
   const [slowMode, setSlowMode] = useState(false);
@@ -886,7 +886,7 @@ function RhythmGame({
     setRoundKey((current) => current + 1);
     setBeat(1);
     setHits([]);
-    setFeedback("กดเริ่มด่านเมื่อคุณพร้อม");
+    setFeedback("Ready when you are");
     setResult(null);
 
     if (!keepSlowMode) {
@@ -898,7 +898,7 @@ function RhythmGame({
     unlockAudio();
     setBeat(1);
     setHits([]);
-    setFeedback("รอให้วงแหวนตรงกับเส้น");
+    setFeedback("Wait for the ring to meet the target");
     setResult(null);
     setRoundKey((current) => current + 1);
     startTimeRef.current = Date.now();
@@ -935,18 +935,18 @@ function RhythmGame({
     const isPerfect = absoluteDifference <= timeTolerance * 0.35;
     const isGood = absoluteDifference <= timeTolerance;
 
-    let message = "ลองรอจังหวะถัดไป";
+    let message = "Try the next beat";
 
     if (isPerfect) {
-      message = "พอดี";
+      message = "Perfect";
     } else if (isGood && timingDifference < 0) {
-      message = "เร็วเล็กน้อย";
+      message = "A little early";
     } else if (isGood) {
-      message = "ช้าเล็กน้อย";
+      message = "A little late";
     } else if (timingDifference < 0) {
-      message = "ลองรออีกนิด";
+      message = "Wait a little longer";
     } else {
-      message = "ลองแตะให้เร็วขึ้นเล็กน้อย";
+      message = "Try tapping a little earlier";
     }
 
     if (isPerfect) {
@@ -994,7 +994,7 @@ function RhythmGame({
     return (
       <section className="screen game-screen">
         <TopBar
-          title={`${level.title} · ด่าน ${stage} จาก 20`}
+          title={`${level.title} · Stage ${stage} of 20`}
           onBack={onBack}
           onPause={onPause}
           onSettings={onSettings}
@@ -1003,18 +1003,18 @@ function RhythmGame({
         <div className="result-panel">
           <div className="result-symbol">{passed ? "◌" : "△"}</div>
 
-          <p className="eyebrow">{passed ? "ทำได้แล้ว" : "ฝึกต่อได้"}</p>
-          <h2>{passed ? "จบด่านแล้ว" : "ยังฝึกด่านนี้ต่อได้"}</h2>
+          <p className="eyebrow">{passed ? "NICE WORK" : "KEEP PRACTICING"}</p>
+          <h2>{passed ? "Stage complete" : "Give it another try"}</h2>
 
           <p className="muted">
             {passed
-              ? "ด่านถัดไปพร้อมเมื่อคุณต้องการ"
-              : "ลองแตะให้ใกล้จังหวะเพิ่มอีกนิด หรือปรับให้ช้าลงได้"}
+              ? "The next stage is ready when you are."
+              : "Try tapping closer to the target, or slow things down."}
           </p>
 
           {settings.showDetails && (
             <div className="result-detail">
-              แตะใกล้จังหวะ {result.goodHits} จาก {result.total} ครั้ง
+              On-beat taps: {result.goodHits} of {result.total}
             </div>
           )}
 
@@ -1022,17 +1022,17 @@ function RhythmGame({
             {passed ? (
               <>
                 <Button onClick={onNext}>
-                  {stage < 20 ? "ไปด่านถัดไป" : "กลับเลือกด่าน"}
+                  {stage < 20 ? "Next stage" : "Choose a stage"}
                 </Button>
 
                 <Button variant="secondary" onClick={() => resetStage()}>
-                  เล่นด่านนี้อีกครั้ง
+                  Play this stage again
                 </Button>
               </>
             ) : (
               <>
                 <Button onClick={() => resetStage()}>
-                  ลองอีกครั้ง
+                  Try again
                 </Button>
 
                 <Button
@@ -1042,13 +1042,13 @@ function RhythmGame({
                     resetStage(true);
                   }}
                 >
-                  ดูจังหวะช้าลง
+                  Slow it down
                 </Button>
               </>
             )}
 
             <Button variant="ghost" onClick={onBack}>
-              กลับเลือกด่าน
+              Back to stages
             </Button>
           </div>
         </div>
@@ -1059,7 +1059,7 @@ function RhythmGame({
   return (
     <section className="screen game-screen">
       <TopBar
-        title={`${level.title} · ด่าน ${stage} จาก 20`}
+        title={`${level.title} · Stage ${stage} of 20`}
         onBack={onBack}
         onPause={onPause}
         onSettings={onSettings}
@@ -1071,28 +1071,28 @@ function RhythmGame({
             <div className="start-stage-symbol">◌</div>
 
             <p className="eyebrow">Tempo</p>
-            <h2>พร้อมเริ่มเมื่อคุณต้องการ</h2>
+            <h2>Ready when you are</h2>
 
             <p className="muted">
-              ดูวงแหวนที่ค่อย ๆ ขยาย
+              Watch the ring expand
               <br />
-              แล้วแตะเมื่อวงแหวนตรงกับเส้น
+              then tap when it reaches the target.
             </p>
 
             <div className="start-stage-info">
               <span>{level.title}</span>
-              <span>ด่าน {stage} จาก 20</span>
-              <span>{totalBeats} จังหวะ</span>
+              <span>Stage {stage} of 20</span>
+              <span>{totalBeats} beats</span>
             </div>
 
-            <Button onClick={startStage}>เริ่มด่าน</Button>
+            <Button onClick={startStage}>Start stage</Button>
           </div>
         ) : (
           <>
             <div className="game-intro">
               <p className="eyebrow">Tempo</p>
-              <h2>แตะเมื่อวงแหวนตรงกับเส้น</h2>
-              <p className="muted">ค่อย ๆ ดู แล้วแตะเมื่อพร้อม</p>
+              <h2>Tap when the ring meets the target</h2>
+              <p className="muted">Take your time. Tap when you are ready.</p>
             </div>
 
             <div
@@ -1112,7 +1112,7 @@ function RhythmGame({
             </p>
 
             <Button className="tap-button" onClick={handleTap}>
-              แตะ
+              Tap
             </Button>
 
             <div className="beat-progress">
@@ -1137,8 +1137,8 @@ function RhythmGame({
             </div>
 
             <p className="stage-note">
-              จังหวะ {beat} จาก {totalBeats}
-              {slowMode ? " · โหมดช้าลง" : ""}
+              Beat {beat} of {totalBeats}
+              {slowMode ? " · Slow mode" : ""}
             </p>
           </>
         )}
@@ -1162,24 +1162,24 @@ return (
 <div className="content narrow">
 <div className="title-block">
 <p className="eyebrow">PATTERN GRID</p>
-<h2>ดูแสง แล้วกดตามลำดับเดิม</h2>
+<h2>Watch the lights, then repeat the sequence</h2>
 <p className="muted">
-รหัสจะค่อย ๆ ยาวขึ้นทีละน้อย
+Sequences get longer little by little.
 <br />
-คุณสามารถดูรหัสซ้ำได้เสมอ
+Replay the sequence whenever you need.
 </p>
 </div>
 
 <div className="continue-box">
 <div>
-<span>เล่นต่อ</span>
-<strong>ด่าน {progress.pattern} จาก 50</strong>
+<span>Continue</span>
+<strong>Stage {progress.pattern} of 50</strong>
 </div>
 
-<Button onClick={onContinue}>เริ่มเล่น</Button>
+<Button onClick={onContinue}>Start</Button>
 </div>
 
-<p className="section-label">ด่านที่เปิดแล้ว</p>
+<p className="section-label">Unlocked stages</p>
 
 <div className="stage-grid pattern-stage-list">
 {Array.from({ length: 50 }, (_, index) => {
@@ -1343,7 +1343,7 @@ if (result) {
 return (
 <section className="screen game-screen">
 <TopBar
-title={`Memo · ด่าน ${stage} จาก 50`}
+          title={`Memo · Stage ${stage} of 50`}
 onBack={onBack}
 onPause={onPause}
 onSettings={onSettings}
@@ -1351,23 +1351,23 @@ onSettings={onSettings}
 
 <div className="result-panel">
 <div className="result-symbol">▦</div>
-<p className="eyebrow">ทำได้แล้ว</p>
-<h2>จบรหัสแล้ว</h2>
+<p className="eyebrow">NICE WORK</p>
+<h2>Sequence complete</h2>
 <p className="muted">
-คุณกดตามลำดับได้ครบ {result.length} จุด
+You repeated all {result.length} steps in order.
 </p>
 
 <div className="result-actions">
 <Button onClick={onNext}>
-{stage < 50 ? "ไปด่านถัดไป" : "กลับหน้าโหมด"}
+{stage < 50 ? "Next stage" : "Back to modes"}
 </Button>
 
 <Button variant="secondary" onClick={newPattern}>
-เล่นด่านนี้อีกครั้ง
+Play this stage again
 </Button>
 
 <Button variant="ghost" onClick={onBack}>
-กลับเลือกด่าน
+Back to stages
 </Button>
 </div>
 </div>
@@ -1375,15 +1375,15 @@ onSettings={onSettings}
 );
 }
 
-let instruction = "กดเริ่มเพื่อดูรหัส";
-if (phase === "showing") instruction = "ดูรหัสให้จบก่อนเริ่มกด";
-if (phase === "input") instruction = "ค่อย ๆ กดตามลำดับที่เห็น";
-if (phase === "wrong") instruction = "ลองดูรหัสอีกครั้ง";
+let instruction = "Press start to watch the sequence";
+if (phase === "showing") instruction = "Watch the full sequence before tapping";
+if (phase === "input") instruction = "Repeat the sequence at your own pace";
+if (phase === "wrong") instruction = "Try watching the sequence again";
 
 return (
 <section className="screen game-screen">
 <TopBar
-title={`Memo · ด่าน ${stage} จาก 50`}
+  title={`Memo · Stage ${stage} of 50`}
 onBack={onBack}
 onPause={onPause}
 onSettings={onSettings}
@@ -1391,12 +1391,12 @@ onSettings={onSettings}
 
 <div className="pattern-game-layout">
 <div className="game-intro">
-<p className="eyebrow">รหัสยาว {pattern.length} จุด</p>
+<p className="eyebrow">{pattern.length}-STEP SEQUENCE</p>
 <h2>{instruction}</h2>
 <p className="muted">
 {phase === "wrong"
-? "รหัสเดิมยังอยู่ คุณดูซ้ำได้เมื่อพร้อม"
-: "ไม่มีเวลาเร่งรีบ"}
+? "Your sequence is still here. Replay it when you are ready."
+: "There is no rush."}
 </p>
 </div>
 
@@ -1417,39 +1417,39 @@ onClick={() => chooseCell(index)}
 
 <p className="pattern-status">
 {phase === "input"
-? `กดแล้ว ${input.length} จาก ${pattern.length} จุด`
+? `Entered ${input.length} of ${pattern.length} steps`
 : phase === "showing"
-? "กำลังแสดงรหัส"
+? "Showing sequence..."
 : phase === "wrong"
-? "รหัสเดิมพร้อมให้ดูซ้ำ"
-: "พร้อมเริ่มเมื่อคุณต้องการ"}
+? "Sequence ready to replay"
+: "Ready when you are"}
 </p>
 
 <div className="game-actions">
 {phase === "ready" && (
-<Button onClick={showPattern}>เริ่มดูรหัส</Button>
+<Button onClick={showPattern}>Show sequence</Button>
 )}
 
 {phase === "input" && (
 <Button variant="secondary" onClick={replayPattern}>
-ดูรหัสอีกครั้ง
+Replay sequence
 </Button>
 )}
 
 {phase === "wrong" && (
 <>
-<Button onClick={retrySamePattern}>ดูรหัสอีกครั้ง</Button>
+<Button onClick={retrySamePattern}>Replay sequence</Button>
 <Button variant="secondary" onClick={slowerPattern}>
-แสดงช้าลง
+Slow it down
 </Button>
 <Button variant="ghost" onClick={newPattern}>
-เปลี่ยนรหัสใหม่
+New sequence
 </Button>
 </>
 )}
 </div>
 
-{slowMode && <p className="stage-note">กำลังแสดงรหัสแบบช้าลง</p>}
+{slowMode && <p className="stage-note">Showing sequence at a slower pace</p>}
 </div>
 </section>
 );
@@ -1459,7 +1459,7 @@ function ProgressScreen({ progress, onBack, onSettings, onRhythm, onPattern }) {
 return (
 <section className="screen">
 <TopBar
-title="ความคืบหน้าของฉัน"
+title="My Progress"
 onBack={onBack}
 onSettings={onSettings}
 />
@@ -1467,8 +1467,8 @@ onSettings={onSettings}
 <div className="content narrow">
 <div className="title-block">
 <p className="eyebrow">MY PROGRESS</p>
-<h2>ดูสิ่งที่คุณเคยฝึก</h2>
-<p className="muted">ข้อมูลอยู่บนอุปกรณ์นี้ และไม่เปรียบเทียบกับใคร</p>
+<h2>Your practice history</h2>
+<p className="muted">Your progress stays on this device and is not compared with anyone else.</p>
 </div>
 
 <div className="progress-card">
@@ -1476,14 +1476,14 @@ onSettings={onSettings}
 <span className="small-icon">◌</span>
 <div>
 <strong>Tempo</strong>
-<small>เลือกระดับเพื่อกลับไปฝึก</small>
+<small>Choose a level to practice</small>
 </div>
 </div>
 
 {Object.entries(RHYTHM_LEVELS).map(([key, level]) => (
 <button className="progress-row" key={key} onClick={() => onRhythm(key)}>
 <span>{level.title}</span>
-<span>ด่าน {progress.rhythm[key]} / 20 →</span>
+<span>Stage {progress.rhythm[key]} / 20 →</span>
 </button>
 ))}
 </div>
@@ -1493,13 +1493,13 @@ onSettings={onSettings}
 <span className="small-icon">▦</span>
 <div>
 <strong>Memo</strong>
-<small>เล่นต่อจากด่านล่าสุดได้</small>
+<small>Continue from your latest stage</small>
 </div>
 </div>
 
 <button className="progress-row" onClick={onPattern}>
-<span>ด่านล่าสุด</span>
-<span>ด่าน {progress.pattern} / 50 →</span>
+<span>Latest stage</span>
+<span>Stage {progress.pattern} / 50 →</span>
 </button>
 </div>
 </div>
@@ -1510,7 +1510,7 @@ onSettings={onSettings}
 function HowToScreen({ onBack, onSettings }) {
 return (
 <section className="screen">
-<TopBar title="วิธีเล่น" onBack={onBack} onSettings={onSettings} />
+<TopBar title="How to Play" onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow how-to">
 <article>
@@ -1521,13 +1521,13 @@ return (
 </div>
 
 <div>
-<p className="eyebrow">โหมด 1</p>
+<p className="eyebrow">MODE 1</p>
 <h2>Tempo</h2>
 <ol>
-<li>ดูวงแหวนที่ค่อย ๆ ขยาย</li>
-<li>รอให้วงแหวนตรงกับเส้นเป้าหมาย</li>
-<li>แตะปุ่ม “แตะ” เมื่อพร้อม</li>
-<li>หากยังไม่ถึงเกณฑ์ เลือกลองอีกครั้งหรือดูช้าลงได้</li>
+<li>Watch the ring expand.</li>
+<li>Wait for it to meet the target.</li>
+<li>Tap the button when you are ready.</li>
+<li>If you miss, try again or slow it down.</li>
 </ol>
 </div>
 </article>
@@ -1540,13 +1540,13 @@ return (
 </div>
 
 <div>
-<p className="eyebrow">โหมด 2</p>
+<p className="eyebrow">MODE 2</p>
 <h2>Memo</h2>
 <ol>
-<li>กด “เริ่มดูรหัส”</li>
-<li>ดูปุ่มที่สว่างทีละปุ่มจนจบ</li>
-<li>กดปุ่มตามลำดับเดิม</li>
-<li>หากกดไม่ตรง ให้ดูรหัสเดิมซ้ำได้ทันที</li>
+<li>Select “Show sequence.”</li>
+<li>Watch each light until the sequence ends.</li>
+<li>Tap the buttons in the same order.</li>
+<li>If you miss, replay the same sequence.</li>
 </ol>
 </div>
 </article>
@@ -1560,17 +1560,17 @@ return (
 <section className="screen centered-screen">
 <div className="result-panel">
 <div className="result-symbol">Ⅱ</div>
-<p className="eyebrow">พักอยู่</p>
-<h2>ความคืบหน้าถูกบันทึกแล้ว</h2>
-<p className="muted">กลับมาเล่นต่อเมื่อพร้อมได้เสมอ</p>
+<p className="eyebrow">PAUSED</p>
+<h2>Your progress has been saved</h2>
+<p className="muted">Come back and continue whenever you are ready.</p>
 
 <div className="result-actions">
-<Button onClick={onResume}>เล่นต่อ</Button>
+<Button onClick={onResume}>Resume</Button>
 <Button variant="secondary" onClick={onHome}>
-กลับหน้าโฮม
+Home
 </Button>
 <Button variant="ghost" onClick={onSettings}>
-การตั้งค่า
+Settings
 </Button>
 </div>
 </div>
@@ -1592,7 +1592,7 @@ return (
 <div className="settings-header">
 <div>
 <p className="eyebrow">SETTINGS</p>
-<h2>การตั้งค่า</h2>
+<h2>Settings</h2>
 </div>
 
 <Button variant="ghost" onClick={onClose}>
@@ -1601,12 +1601,12 @@ return (
 </div>
 
 <p className="muted settings-intro">
-ปรับเกมให้รู้สึกสบายกับคุณมากขึ้น
+Make the game more comfortable for you.
 </p>
 
 <SettingRow
-label="เสียงตอบรับ"
-description="เสียงสั้น ๆ เมื่อแตะใกล้จังหวะในโหมดTempo"
+label="Feedback sound"
+description="A short sound when you tap near the beat in Tempo."
 >
 <Toggle
 checked={settings.feedbackSound}
@@ -1616,36 +1616,36 @@ onChange={(value) => update("feedbackSound", value)}
 
 
 <SettingRow
-label="ขนาดตัวอักษร"
-description="ปรับขนาดข้อความในเกม"
+label="Text size"
+description="Adjust the size of game text."
 >
 <select
 value={settings.fontSize}
 onChange={(event) => update("fontSize", event.target.value)}
 >
-<option value="small">เล็ก</option>
-<option value="normal">ปกติ</option>
-<option value="large">ใหญ่</option>
+<option value="small">Small</option>
+<option value="normal">Medium</option>
+<option value="large">Large</option>
 </select>
 </SettingRow>
 
 <SettingRow
-label="ความเร็วMemo"
-description="ความเร็วที่ปุ่มสว่างในโหมดMemo"
+label="Memo speed"
+description="How quickly the lights appear in Memo."
 >
 <select
 value={settings.patternSpeed}
 onChange={(event) => update("patternSpeed", event.target.value)}
 >
-<option value="slow">ช้า</option>
-<option value="normal">ปกติ</option>
-<option value="fast">เร็ว</option>
+<option value="slow">Slow</option>
+<option value="normal">Normal</option>
+<option value="fast">Fast</option>
 </select>
 </SettingRow>
 
 <SettingRow
-label="รายละเอียดผลลัพธ์"
-description="แสดงจำนวนครั้งที่แตะใกล้จังหวะเมื่อจบด่าน"
+label="Score details"
+description="Show on-beat taps when a stage ends."
 >
 <Toggle
 checked={settings.showDetails}
@@ -1654,7 +1654,7 @@ onChange={(value) => update("showDetails", value)}
 </SettingRow>
 
 <Button className="settings-done" onClick={onClose}>
-เสร็จแล้ว
+Done
 </Button>
 </section>
 </div>
@@ -1682,7 +1682,7 @@ onClick={() => onChange(!checked)}
 aria-pressed={checked}
 >
 <span className="toggle-dot" />
-<strong>{checked ? "เปิด" : "ปิด"}</strong>
+<strong>{checked ? "On" : "Off"}</strong>
 </button>
 );
 }
