@@ -1,5 +1,57 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import gameLogo from "./assets/LOGOTEMPOMEMO.png";
+
+const LanguageContext = createContext("en");
+
+const THAI_TEXT = {
+  "Back": "ย้อนกลับ", "Pause": "พักเกม", "Settings": "ตั้งค่า",
+  "Choose a Mode": "เลือกโหมด", "My Progress": "ความคืบหน้าของฉัน", "How to Play": "วิธีเล่น",
+  "CHOOSE AN ACTIVITY": "เลือกกิจกรรม", "What would you like to play today?": "วันนี้อยากเล่นอะไรดี?",
+  "Pick an activity that feels right.": "เลือกกิจกรรมที่เหมาะกับคุณ",
+  "Tap when the ring meets the target": "แตะเมื่อวงแหวนถึงเป้าหมาย", "Focus · patience · timing": "สมาธิ · ความอดทน · จังหวะ",
+  "Watch the sequence, then repeat it": "จำลำดับไฟแล้วกดตาม", "Memory · sequencing · attention": "ความจำ · ลำดับ · ความใส่ใจ",
+  "CHOOSE YOUR PACE": "เลือกระดับความเร็ว", "Where would you like to start?": "อยากเริ่มจากระดับไหน?",
+  "Choose any level.": "เลือกเล่นระดับใดก็ได้", "Clear stages to unlock the next one.": "ผ่านด่านเพื่อปลดล็อกด่านถัดไป",
+  "Beginner": "เริ่มต้น", "Intermediate": "ปานกลาง", "Challenge": "ท้าทาย", "MY PROGRESS": "ความคืบหน้าของฉัน",
+  "Slow pace · wide ring": "จังหวะช้า · เป้าหมายกว้าง", "Moderate pace · tighter target": "จังหวะปานกลาง · เป้าหมายแคบลง", "Faster pace · sharper focus": "จังหวะเร็ว · ต้องใช้สมาธิมากขึ้น",
+  "Stage": "ด่าน", "of": "จาก", "CHOOSE A STAGE": "เลือกด่าน", "Practice at your own pace": "ฝึกในจังหวะของคุณ",
+  "Clear a stage to unlock the next one.": "ผ่านด่านเพื่อปลดล็อกด่านถัดไป",
+  "Ready when you are": "พร้อมเมื่อคุณพร้อม", "Wait for the ring to meet the target": "รอให้วงแหวนถึงเป้าหมาย",
+  "Try the next beat": "ลองจังหวะถัดไป", "Perfect": "เยี่ยมมาก", "A little early": "เร็วไปนิด", "A little late": "ช้าไปนิด",
+  "Wait a little longer": "รออีกสักนิด", "Try tapping a little earlier": "ลองแตะให้เร็วกว่านี้", "NICE WORK": "ทำได้ดีมาก",
+  "KEEP PRACTICING": "ฝึกต่ออีกนิด", "Stage complete": "ผ่านด่านแล้ว", "Give it another try": "ลองอีกครั้ง",
+  "The next stage is ready when you are.": "ด่านถัดไปรอคุณอยู่", "Try tapping closer to the target, or slow things down.": "ลองแตะให้ใกล้เป้าหมายขึ้น หรือปรับให้ช้าลง",
+  "On-beat taps:": "แตะตรงจังหวะ:", "Next stage": "ด่านถัดไป", "Choose a stage": "เลือกด่าน",
+  "Play this stage again": "เล่นด่านนี้อีกครั้ง", "Try again": "ลองอีกครั้ง", "Slow it down": "ปรับให้ช้าลง", "Back to stages": "กลับไปหน้าด่าน",
+  "Watch the ring expand": "ดูวงแหวนขยาย", "then tap when it reaches the target.": "แล้วแตะเมื่อวงแหวนถึงเป้าหมาย", "beats": "จังหวะ", "Start stage": "เริ่มด่าน",
+  "Take your time. Tap when you are ready.": "ไม่ต้องรีบ แตะเมื่อพร้อม", "Tap": "แตะ", "Beat": "จังหวะ", "Slow mode": "โหมดช้า",
+  "PATTERN GRID": "ตารางรูปแบบ", "Watch the lights, then repeat the sequence": "ดูลำดับไฟ แล้วกดตาม", "Sequences get longer little by little.": "ลำดับจะยาวขึ้นทีละนิด",
+  "Replay the sequence whenever you need.": "ดูลำดับซ้ำได้ทุกเมื่อ", "Continue": "เล่นต่อ", "Start": "เริ่ม", "Unlocked stages": "ด่านที่ปลดล็อกแล้ว",
+  "Press start to watch the sequence": "กดเริ่มเพื่อดูลำดับ", "Watch the full sequence before tapping": "ดูลำดับให้จบก่อนเริ่มกด",
+  "Repeat the sequence at your own pace": "กดตามลำดับในจังหวะของคุณ", "Try watching the sequence again": "ลองดูลำดับอีกครั้ง",
+  "Your sequence is still here. Replay it when you are ready.": "ลำดับเดิมยังอยู่ ดูซ้ำได้เมื่อพร้อม", "There is no rush.": "ไม่ต้องรีบ",
+  "Entered": "กดแล้ว", "steps": "ขั้น", "Showing sequence...": "กำลังแสดงลำดับ...", "Sequence ready to replay": "พร้อมดูลำดับซ้ำ",
+  "Show sequence": "แสดงลำดับ", "Replay sequence": "ดูลำดับซ้ำ", "New sequence": "สุ่มลำดับใหม่", "Showing sequence at a slower pace": "กำลังแสดงลำดับแบบช้าลง",
+  "Sequence complete": "จำลำดับได้ครบแล้ว", "You repeated all": "คุณกดครบทั้ง", "in order.": "ขั้นตามลำดับ", "Back to modes": "กลับไปเลือกโหมด",
+  "Your practice history": "ประวัติการฝึกของคุณ", "Your progress stays on this device and is not compared with anyone else.": "ความคืบหน้าจะบันทึกไว้ในอุปกรณ์นี้และไม่มีการเปรียบเทียบกับผู้อื่น",
+  "Choose a level to practice": "เลือกระดับเพื่อฝึก", "Continue from your latest stage": "เล่นต่อจากด่านล่าสุด", "Latest stage": "ด่านล่าสุด",
+  "MODE 1": "โหมด 1", "Watch the ring expand.": "ดูวงแหวนขยาย", "Wait for it to meet the target.": "รอให้วงแหวนถึงเป้าหมาย", "Tap the button when you are ready.": "แตะปุ่มเมื่อพร้อม",
+  "If you miss, try again or slow it down.": "ถ้าพลาด ลองอีกครั้งหรือปรับให้ช้าลง", "MODE 2": "โหมด 2", "Select “Show sequence.”": "เลือก “แสดงลำดับ”",
+  "Watch each light until the sequence ends.": "ดูลำดับไฟจนจบ", "Tap the buttons in the same order.": "แตะปุ่มตามลำดับเดิม", "If you miss, replay the same sequence.": "ถ้าพลาด ให้ดูลำดับเดิมซ้ำ",
+  "PAUSED": "พักเกม", "Your progress has been saved": "บันทึกความคืบหน้าแล้ว", "Come back and continue whenever you are ready.": "กลับมาเล่นต่อได้ทุกเมื่อที่พร้อม",
+  "Resume": "เล่นต่อ", "Home": "หน้าหลัก", "SETTINGS": "ตั้งค่า", "Make the game more comfortable for you.": "ปรับเกมให้เหมาะกับคุณมากขึ้น",
+  "Feedback sound": "เสียงตอบรับ", "A short sound when you tap near the beat in Tempo.": "เล่นเสียงสั้น ๆ เมื่อแตะใกล้จังหวะใน Tempo",
+  "Text size": "ขนาดตัวอักษร", "Adjust the size of game text.": "ปรับขนาดตัวอักษรในเกม", "Small": "เล็ก", "Medium": "กลาง", "Large": "ใหญ่",
+  "Memo speed": "ความเร็ว Memo", "How quickly the lights appear in Memo.": "ปรับความเร็วการแสดงไฟใน Memo", "Slow": "ช้า", "Normal": "ปกติ", "Fast": "เร็ว",
+  "Score details": "รายละเอียดคะแนน", "Show on-beat taps when a stage ends.": "แสดงจำนวนครั้งที่แตะตรงจังหวะเมื่อจบด่าน", "Done": "เสร็จสิ้น", "On": "เปิด", "Off": "ปิด",
+  "Language": "ภาษา", "Choose the language used in the game.": "เลือกภาษาที่ใช้ในเกม", "English": "English", "Thai": "ไทย",
+  "STEP SEQUENCE": "ขั้นในลำดับ",
+};
+
+function useTranslation() {
+  const language = useContext(LanguageContext);
+  return (text) => language === "th" ? THAI_TEXT[text] || text : text;
+}
 
 const STORAGE_KEY = "calm-focus-game-v2";
 const APP_HISTORY_KEY = "calm-focus-lab-route";
@@ -25,6 +77,7 @@ feedbackSound: false,
 showDetails: true,
 fontSize: "normal",
 patternSpeed: "normal",
+language: "en",
 };
 
 const DEFAULT_PROGRESS = {
@@ -196,10 +249,11 @@ return (
 }
 
 function TopBar({ title, onBack, onPause, onSettings }) {
+const t = useTranslation();
 return (
 <header className="topbar">
 <Button variant="ghost" onClick={onBack}>
-← Back
+← {t("Back")}
 </Button>
 
 <h1 className="topbar-title">{title}</h1>
@@ -207,11 +261,11 @@ return (
 <div className="topbar-actions">
 {onPause && (
 <Button variant="ghost" onClick={onPause}>
-⏸ Pause
+⏸ {t("Pause")}
 </Button>
 )}
 
-<Button variant="ghost" onClick={onSettings} aria-label="Settings">
+<Button variant="ghost" onClick={onSettings} aria-label={t("Settings")}>
 ⚙
 </Button>
 </div>
@@ -353,6 +407,10 @@ useEffect(() => {
 useEffect(() => {
 document.documentElement.dataset.fontSize = settings.fontSize;
 }, [settings]);
+
+useEffect(() => {
+  document.documentElement.lang = settings.language || "en";
+}, [settings.language]);
 
 
 function openSettings() {
@@ -564,6 +622,7 @@ if (screen === "pause") {
 }
 
 return (
+<LanguageContext.Provider value={settings.language || "en"}>
 <main className="app-shell">
 {page}
 
@@ -575,10 +634,12 @@ onClose={closeSettings}
 />
 )}
 </main>
+</LanguageContext.Provider>
 );
 }
 
 function HomeScreen({ onChooseMode, onProgress, onHowTo, onSettings }) {
+const t = useTranslation();
 return (
 <section className="screen home-screen">
 <div className="home-brand">
@@ -588,25 +649,25 @@ return (
 <div className="home-menu">
 <Button className="home-main-button" onClick={onChooseMode}>
 <span className="button-icon">◌</span>
-Choose a Mode
+{t("Choose a Mode")}
 <span className="button-arrow">→</span>
 </Button>
 
 <Button variant="secondary" className="home-menu-button" onClick={onProgress}>
 <span className="button-icon">▤</span>
-My Progress
+{t("My Progress")}
 <span className="button-arrow">→</span>
 </Button>
 
 <Button variant="secondary" className="home-menu-button" onClick={onHowTo}>
 <span className="button-icon">?</span>
-How to Play
+{t("How to Play")}
 <span className="button-arrow">→</span>
 </Button>
 
 <Button variant="secondary" className="home-menu-button" onClick={onSettings}>
 <span className="button-icon">⚙</span>
-Settings
+{t("Settings")}
 <span className="button-arrow">→</span>
 </Button>
 </div>
@@ -615,15 +676,16 @@ Settings
 }
 
 function ModeSelectScreen({ onBack, onSettings, onRhythm, onPattern }) {
+const t = useTranslation();
 return (
 <section className="screen">
-<TopBar title="Choose a Mode" onBack={onBack} onSettings={onSettings} />
+<TopBar title={t("Choose a Mode")} onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">CHOOSE AN ACTIVITY</p>
-<h2>What would you like to play today?</h2>
-<p className="muted">Pick an activity that feels right.</p>
+<p className="eyebrow">{t("CHOOSE AN ACTIVITY")}</p>
+<h2>{t("What would you like to play today?")}</h2>
+<p className="muted">{t("Pick an activity that feels right.")}</p>
 </div>
 
 <button className="large-mode-card" onClick={onRhythm}>
@@ -635,8 +697,8 @@ return (
 
 <div className="mode-card-text">
 <strong>Tempo</strong>
-<small>Tap when the ring meets the target</small>
-<small className="mode-skill">Focus · patience · timing</small>
+<small>{t("Tap when the ring meets the target")}</small>
+<small className="mode-skill">{t("Focus · patience · timing")}</small>
 </div>
 
 <span className="card-arrow">→</span>
@@ -651,8 +713,8 @@ return (
 
 <div className="mode-card-text">
 <strong>Memo</strong>
-<small>Watch the sequence, then repeat it</small>
-<small className="mode-skill">Memory · sequencing · attention</small>
+<small>{t("Watch the sequence, then repeat it")}</small>
+<small className="mode-skill">{t("Memory · sequencing · attention")}</small>
 </div>
 
 <span className="card-arrow">→</span>
@@ -668,18 +730,19 @@ onBack,
 onSettings,
 onChooseLevel,
 }) {
+const t = useTranslation();
 return (
 <section className="screen">
 <TopBar title="Tempo" onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">CHOOSE YOUR PACE</p>
-<h2>Where would you like to start?</h2>
+<p className="eyebrow">{t("CHOOSE YOUR PACE")}</p>
+<h2>{t("Where would you like to start?")}</h2>
 <p className="muted">
-Choose any level.
+{t("Choose any level.")}
 <br />
-Clear stages to unlock the next one.
+{t("Clear stages to unlock the next one.")}
 </p>
 </div>
 
@@ -696,9 +759,9 @@ onClick={() => onChooseLevel(key)}
 </div>
 
 <div>
-<strong>{level.title}</strong>
-<small>{level.detail}</small>
-<small>Stage {progress.rhythm[key]} of 20</small>
+<strong>{t(level.title)}</strong>
+<small>{t(level.detail)}</small>
+<small>{t("Stage")} {progress.rhythm[key]} {t("of")} 20</small>
 </div>
 
 <span className="card-arrow">→</span>
@@ -716,21 +779,22 @@ onBack,
 onSettings,
 onChooseStage,
 }) {
+const t = useTranslation();
 const level = RHYTHM_LEVELS[levelKey];
 
 return (
 <section className="screen">
 <TopBar
-title={`Tempo · ${level.title}`}
+title={`Tempo · ${t(level.title)}`}
 onBack={onBack}
 onSettings={onSettings}
 />
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">CHOOSE A STAGE</p>
-<h2>Practice at your own pace</h2>
-<p className="muted">Clear a stage to unlock the next one.</p>
+<p className="eyebrow">{t("CHOOSE A STAGE")}</p>
+<h2>{t("Practice at your own pace")}</h2>
+<p className="muted">{t("Clear a stage to unlock the next one.")}</p>
 </div>
 
 <div className="stage-grid">
@@ -765,6 +829,7 @@ function RhythmGame({
   onPass,
   onNext,
 }) {
+  const t = useTranslation();
   const level = RHYTHM_LEVELS[levelKey];
 
   const [hasStarted, setHasStarted] = useState(false);
@@ -994,7 +1059,7 @@ function RhythmGame({
     return (
       <section className="screen game-screen">
         <TopBar
-          title={`${level.title} · Stage ${stage} of 20`}
+          title={`${t(level.title)} · ${t("Stage")} ${stage} ${t("of")} 20`}
           onBack={onBack}
           onPause={onPause}
           onSettings={onSettings}
@@ -1003,18 +1068,18 @@ function RhythmGame({
         <div className="result-panel">
           <div className="result-symbol">{passed ? "◌" : "△"}</div>
 
-          <p className="eyebrow">{passed ? "NICE WORK" : "KEEP PRACTICING"}</p>
-          <h2>{passed ? "Stage complete" : "Give it another try"}</h2>
+          <p className="eyebrow">{t(passed ? "NICE WORK" : "KEEP PRACTICING")}</p>
+          <h2>{t(passed ? "Stage complete" : "Give it another try")}</h2>
 
           <p className="muted">
             {passed
-              ? "The next stage is ready when you are."
-              : "Try tapping closer to the target, or slow things down."}
+              ? t("The next stage is ready when you are.")
+              : t("Try tapping closer to the target, or slow things down.")}
           </p>
 
           {settings.showDetails && (
             <div className="result-detail">
-              On-beat taps: {result.goodHits} of {result.total}
+              {t("On-beat taps:")} {result.goodHits} {t("of")} {result.total}
             </div>
           )}
 
@@ -1022,17 +1087,17 @@ function RhythmGame({
             {passed ? (
               <>
                 <Button onClick={onNext}>
-                  {stage < 20 ? "Next stage" : "Choose a stage"}
+                  {t(stage < 20 ? "Next stage" : "Choose a stage")}
                 </Button>
 
                 <Button variant="secondary" onClick={() => resetStage()}>
-                  Play this stage again
+                  {t("Play this stage again")}
                 </Button>
               </>
             ) : (
               <>
                 <Button onClick={() => resetStage()}>
-                  Try again
+                  {t("Try again")}
                 </Button>
 
                 <Button
@@ -1042,13 +1107,13 @@ function RhythmGame({
                     resetStage(true);
                   }}
                 >
-                  Slow it down
+                  {t("Slow it down")}
                 </Button>
               </>
             )}
 
             <Button variant="ghost" onClick={onBack}>
-              Back to stages
+              {t("Back to stages")}
             </Button>
           </div>
         </div>
@@ -1059,7 +1124,7 @@ function RhythmGame({
   return (
     <section className="screen game-screen">
       <TopBar
-        title={`${level.title} · Stage ${stage} of 20`}
+        title={`${t(level.title)} · ${t("Stage")} ${stage} ${t("of")} 20`}
         onBack={onBack}
         onPause={onPause}
         onSettings={onSettings}
@@ -1071,28 +1136,28 @@ function RhythmGame({
             <div className="start-stage-symbol">◌</div>
 
             <p className="eyebrow">Tempo</p>
-            <h2>Ready when you are</h2>
+            <h2>{t("Ready when you are")}</h2>
 
             <p className="muted">
-              Watch the ring expand
+              {t("Watch the ring expand")}
               <br />
-              then tap when it reaches the target.
+              {t("then tap when it reaches the target.")}
             </p>
 
             <div className="start-stage-info">
-              <span>{level.title}</span>
-              <span>Stage {stage} of 20</span>
-              <span>{totalBeats} beats</span>
+              <span>{t(level.title)}</span>
+              <span>{t("Stage")} {stage} {t("of")} 20</span>
+              <span>{totalBeats} {t("beats")}</span>
             </div>
 
-            <Button onClick={startStage}>Start stage</Button>
+            <Button onClick={startStage}>{t("Start stage")}</Button>
           </div>
         ) : (
           <>
             <div className="game-intro">
               <p className="eyebrow">Tempo</p>
-              <h2>Tap when the ring meets the target</h2>
-              <p className="muted">Take your time. Tap when you are ready.</p>
+              <h2>{t("Tap when the ring meets the target")}</h2>
+              <p className="muted">{t("Take your time. Tap when you are ready.")}</p>
             </div>
 
             <div
@@ -1108,11 +1173,11 @@ function RhythmGame({
             </div>
 
             <p className="feedback" aria-live="polite">
-              {feedback}
+              {t(feedback)}
             </p>
 
             <Button className="tap-button" onClick={handleTap}>
-              Tap
+              {t("Tap")}
             </Button>
 
             <div className="beat-progress">
@@ -1137,8 +1202,8 @@ function RhythmGame({
             </div>
 
             <p className="stage-note">
-              Beat {beat} of {totalBeats}
-              {slowMode ? " · Slow mode" : ""}
+              {t("Beat")} {beat} {t("of")} {totalBeats}
+              {slowMode ? ` · ${t("Slow mode")}` : ""}
             </p>
           </>
         )}
@@ -1155,31 +1220,32 @@ onSettings,
 onContinue,
 onChooseStage,
 }) {
+const t = useTranslation();
 return (
 <section className="screen">
 <TopBar title="Memo" onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">PATTERN GRID</p>
-<h2>Watch the lights, then repeat the sequence</h2>
+<p className="eyebrow">{t("PATTERN GRID")}</p>
+<h2>{t("Watch the lights, then repeat the sequence")}</h2>
 <p className="muted">
-Sequences get longer little by little.
+{t("Sequences get longer little by little.")}
 <br />
-Replay the sequence whenever you need.
+{t("Replay the sequence whenever you need.")}
 </p>
 </div>
 
 <div className="continue-box">
 <div>
-<span>Continue</span>
-<strong>Stage {progress.pattern} of 50</strong>
+<span>{t("Continue")}</span>
+<strong>{t("Stage")} {progress.pattern} {t("of")} 50</strong>
 </div>
 
-<Button onClick={onContinue}>Start</Button>
+<Button onClick={onContinue}>{t("Start")}</Button>
 </div>
 
-<p className="section-label">Unlocked stages</p>
+<p className="section-label">{t("Unlocked stages")}</p>
 
 <div className="stage-grid pattern-stage-list">
 {Array.from({ length: 50 }, (_, index) => {
@@ -1212,6 +1278,7 @@ onSettings,
 onPass,
 onNext,
 }) {
+const t = useTranslation();
 const [pattern, setPattern] = useState(() => generatePattern(stage));
 const [phase, setPhase] = useState("ready");
 const [litCell, setLitCell] = useState(null);
@@ -1343,7 +1410,7 @@ if (result) {
 return (
 <section className="screen game-screen">
 <TopBar
-          title={`Memo · Stage ${stage} of 50`}
+          title={`Memo · ${t("Stage")} ${stage} ${t("of")} 50`}
 onBack={onBack}
 onPause={onPause}
 onSettings={onSettings}
@@ -1351,23 +1418,23 @@ onSettings={onSettings}
 
 <div className="result-panel">
 <div className="result-symbol">▦</div>
-<p className="eyebrow">NICE WORK</p>
-<h2>Sequence complete</h2>
+<p className="eyebrow">{t("NICE WORK")}</p>
+<h2>{t("Sequence complete")}</h2>
 <p className="muted">
-You repeated all {result.length} steps in order.
+{t("You repeated all")} {result.length} {t("steps")} {t("in order.")}
 </p>
 
 <div className="result-actions">
 <Button onClick={onNext}>
-{stage < 50 ? "Next stage" : "Back to modes"}
+{t(stage < 50 ? "Next stage" : "Back to modes")}
 </Button>
 
 <Button variant="secondary" onClick={newPattern}>
-Play this stage again
+{t("Play this stage again")}
 </Button>
 
 <Button variant="ghost" onClick={onBack}>
-Back to stages
+{t("Back to stages")}
 </Button>
 </div>
 </div>
@@ -1375,15 +1442,15 @@ Back to stages
 );
 }
 
-let instruction = "Press start to watch the sequence";
-if (phase === "showing") instruction = "Watch the full sequence before tapping";
-if (phase === "input") instruction = "Repeat the sequence at your own pace";
-if (phase === "wrong") instruction = "Try watching the sequence again";
+let instruction = t("Press start to watch the sequence");
+if (phase === "showing") instruction = t("Watch the full sequence before tapping");
+if (phase === "input") instruction = t("Repeat the sequence at your own pace");
+if (phase === "wrong") instruction = t("Try watching the sequence again");
 
 return (
 <section className="screen game-screen">
 <TopBar
-  title={`Memo · Stage ${stage} of 50`}
+  title={`Memo · ${t("Stage")} ${stage} ${t("of")} 50`}
 onBack={onBack}
 onPause={onPause}
 onSettings={onSettings}
@@ -1391,12 +1458,12 @@ onSettings={onSettings}
 
 <div className="pattern-game-layout">
 <div className="game-intro">
-<p className="eyebrow">{pattern.length}-STEP SEQUENCE</p>
+<p className="eyebrow">{pattern.length} {t("STEP SEQUENCE")}</p>
 <h2>{instruction}</h2>
 <p className="muted">
 {phase === "wrong"
-? "Your sequence is still here. Replay it when you are ready."
-: "There is no rush."}
+? t("Your sequence is still here. Replay it when you are ready.")
+: t("There is no rush.")}
 </p>
 </div>
 
@@ -1417,58 +1484,59 @@ onClick={() => chooseCell(index)}
 
 <p className="pattern-status">
 {phase === "input"
-? `Entered ${input.length} of ${pattern.length} steps`
+? `${t("Entered")} ${input.length} ${t("of")} ${pattern.length} ${t("steps")}`
 : phase === "showing"
-? "Showing sequence..."
+? t("Showing sequence...")
 : phase === "wrong"
-? "Sequence ready to replay"
-: "Ready when you are"}
+? t("Sequence ready to replay")
+: t("Ready when you are")}
 </p>
 
 <div className="game-actions">
 {phase === "ready" && (
-<Button onClick={showPattern}>Show sequence</Button>
+<Button onClick={showPattern}>{t("Show sequence")}</Button>
 )}
 
 {phase === "input" && (
 <Button variant="secondary" onClick={replayPattern}>
-Replay sequence
+{t("Replay sequence")}
 </Button>
 )}
 
 {phase === "wrong" && (
 <>
-<Button onClick={retrySamePattern}>Replay sequence</Button>
+<Button onClick={retrySamePattern}>{t("Replay sequence")}</Button>
 <Button variant="secondary" onClick={slowerPattern}>
-Slow it down
+{t("Slow it down")}
 </Button>
 <Button variant="ghost" onClick={newPattern}>
-New sequence
+{t("New sequence")}
 </Button>
 </>
 )}
 </div>
 
-{slowMode && <p className="stage-note">Showing sequence at a slower pace</p>}
+{slowMode && <p className="stage-note">{t("Showing sequence at a slower pace")}</p>}
 </div>
 </section>
 );
 }
 
 function ProgressScreen({ progress, onBack, onSettings, onRhythm, onPattern }) {
+const t = useTranslation();
 return (
 <section className="screen">
 <TopBar
-title="My Progress"
+title={t("My Progress")}
 onBack={onBack}
 onSettings={onSettings}
 />
 
 <div className="content narrow">
 <div className="title-block">
-<p className="eyebrow">MY PROGRESS</p>
-<h2>Your practice history</h2>
-<p className="muted">Your progress stays on this device and is not compared with anyone else.</p>
+<p className="eyebrow">{t("MY PROGRESS")}</p>
+<h2>{t("Your practice history")}</h2>
+<p className="muted">{t("Your progress stays on this device and is not compared with anyone else.")}</p>
 </div>
 
 <div className="progress-card">
@@ -1476,14 +1544,14 @@ onSettings={onSettings}
 <span className="small-icon">◌</span>
 <div>
 <strong>Tempo</strong>
-<small>Choose a level to practice</small>
+<small>{t("Choose a level to practice")}</small>
 </div>
 </div>
 
 {Object.entries(RHYTHM_LEVELS).map(([key, level]) => (
 <button className="progress-row" key={key} onClick={() => onRhythm(key)}>
-<span>{level.title}</span>
-<span>Stage {progress.rhythm[key]} / 20 →</span>
+<span>{t(level.title)}</span>
+<span>{t("Stage")} {progress.rhythm[key]} / 20 →</span>
 </button>
 ))}
 </div>
@@ -1493,13 +1561,13 @@ onSettings={onSettings}
 <span className="small-icon">▦</span>
 <div>
 <strong>Memo</strong>
-<small>Continue from your latest stage</small>
+<small>{t("Continue from your latest stage")}</small>
 </div>
 </div>
 
 <button className="progress-row" onClick={onPattern}>
-<span>Latest stage</span>
-<span>Stage {progress.pattern} / 50 →</span>
+<span>{t("Latest stage")}</span>
+<span>{t("Stage")} {progress.pattern} / 50 →</span>
 </button>
 </div>
 </div>
@@ -1508,9 +1576,10 @@ onSettings={onSettings}
 }
 
 function HowToScreen({ onBack, onSettings }) {
+const t = useTranslation();
 return (
 <section className="screen">
-<TopBar title="How to Play" onBack={onBack} onSettings={onSettings} />
+<TopBar title={t("How to Play")} onBack={onBack} onSettings={onSettings} />
 
 <div className="content narrow how-to">
 <article>
@@ -1521,13 +1590,13 @@ return (
 </div>
 
 <div>
-<p className="eyebrow">MODE 1</p>
+<p className="eyebrow">{t("MODE 1")}</p>
 <h2>Tempo</h2>
 <ol>
-<li>Watch the ring expand.</li>
-<li>Wait for it to meet the target.</li>
-<li>Tap the button when you are ready.</li>
-<li>If you miss, try again or slow it down.</li>
+<li>{t("Watch the ring expand.")}</li>
+<li>{t("Wait for it to meet the target.")}</li>
+<li>{t("Tap the button when you are ready.")}</li>
+<li>{t("If you miss, try again or slow it down.")}</li>
 </ol>
 </div>
 </article>
@@ -1540,13 +1609,13 @@ return (
 </div>
 
 <div>
-<p className="eyebrow">MODE 2</p>
+<p className="eyebrow">{t("MODE 2")}</p>
 <h2>Memo</h2>
 <ol>
-<li>Select “Show sequence.”</li>
-<li>Watch each light until the sequence ends.</li>
-<li>Tap the buttons in the same order.</li>
-<li>If you miss, replay the same sequence.</li>
+<li>{t("Select “Show sequence.”")}</li>
+<li>{t("Watch each light until the sequence ends.")}</li>
+<li>{t("Tap the buttons in the same order.")}</li>
+<li>{t("If you miss, replay the same sequence.")}</li>
 </ol>
 </div>
 </article>
@@ -1556,21 +1625,22 @@ return (
 }
 
 function PauseScreen({ onResume, onHome, onSettings }) {
+const t = useTranslation();
 return (
 <section className="screen centered-screen">
 <div className="result-panel">
 <div className="result-symbol">Ⅱ</div>
-<p className="eyebrow">PAUSED</p>
-<h2>Your progress has been saved</h2>
-<p className="muted">Come back and continue whenever you are ready.</p>
+<p className="eyebrow">{t("PAUSED")}</p>
+<h2>{t("Your progress has been saved")}</h2>
+<p className="muted">{t("Come back and continue whenever you are ready.")}</p>
 
 <div className="result-actions">
-<Button onClick={onResume}>Resume</Button>
+<Button onClick={onResume}>{t("Resume")}</Button>
 <Button variant="secondary" onClick={onHome}>
-Home
+{t("Home")}
 </Button>
 <Button variant="ghost" onClick={onSettings}>
-Settings
+{t("Settings")}
 </Button>
 </div>
 </div>
@@ -1579,6 +1649,7 @@ Settings
 }
 
 function SettingsModal({ settings, onChange, onClose }) {
+const t = useTranslation();
 function update(key, value) {
 onChange((current) => ({
 ...current,
@@ -1591,8 +1662,8 @@ return (
 <section className="settings-modal">
 <div className="settings-header">
 <div>
-<p className="eyebrow">SETTINGS</p>
-<h2>Settings</h2>
+<p className="eyebrow">{t("SETTINGS")}</p>
+<h2>{t("Settings")}</h2>
 </div>
 
 <Button variant="ghost" onClick={onClose}>
@@ -1601,12 +1672,25 @@ return (
 </div>
 
 <p className="muted settings-intro">
-Make the game more comfortable for you.
+{t("Make the game more comfortable for you.")}
 </p>
 
 <SettingRow
-label="Feedback sound"
-description="A short sound when you tap near the beat in Tempo."
+label={t("Language")}
+description={t("Choose the language used in the game.")}
+>
+<select
+value={settings.language || "en"}
+onChange={(event) => update("language", event.target.value)}
+>
+<option value="en">English</option>
+<option value="th">ไทย</option>
+</select>
+</SettingRow>
+
+<SettingRow
+label={t("Feedback sound")}
+description={t("A short sound when you tap near the beat in Tempo.")}
 >
 <Toggle
 checked={settings.feedbackSound}
@@ -1616,36 +1700,36 @@ onChange={(value) => update("feedbackSound", value)}
 
 
 <SettingRow
-label="Text size"
-description="Adjust the size of game text."
+label={t("Text size")}
+description={t("Adjust the size of game text.")}
 >
 <select
 value={settings.fontSize}
 onChange={(event) => update("fontSize", event.target.value)}
 >
-<option value="small">Small</option>
-<option value="normal">Medium</option>
-<option value="large">Large</option>
+<option value="small">{t("Small")}</option>
+<option value="normal">{t("Medium")}</option>
+<option value="large">{t("Large")}</option>
 </select>
 </SettingRow>
 
 <SettingRow
-label="Memo speed"
-description="How quickly the lights appear in Memo."
+label={t("Memo speed")}
+description={t("How quickly the lights appear in Memo.")}
 >
 <select
 value={settings.patternSpeed}
 onChange={(event) => update("patternSpeed", event.target.value)}
 >
-<option value="slow">Slow</option>
-<option value="normal">Normal</option>
-<option value="fast">Fast</option>
+<option value="slow">{t("Slow")}</option>
+<option value="normal">{t("Normal")}</option>
+<option value="fast">{t("Fast")}</option>
 </select>
 </SettingRow>
 
 <SettingRow
-label="Score details"
-description="Show on-beat taps when a stage ends."
+label={t("Score details")}
+description={t("Show on-beat taps when a stage ends.")}
 >
 <Toggle
 checked={settings.showDetails}
@@ -1654,7 +1738,7 @@ onChange={(value) => update("showDetails", value)}
 </SettingRow>
 
 <Button className="settings-done" onClick={onClose}>
-Done
+{t("Done")}
 </Button>
 </section>
 </div>
@@ -1675,6 +1759,7 @@ return (
 }
 
 function Toggle({ checked, onChange }) {
+const t = useTranslation();
 return (
 <button
 className={`toggle ${checked ? "on" : ""}`}
@@ -1682,7 +1767,7 @@ onClick={() => onChange(!checked)}
 aria-pressed={checked}
 >
 <span className="toggle-dot" />
-<strong>{checked ? "On" : "Off"}</strong>
+<strong>{t(checked ? "On" : "Off")}</strong>
 </button>
 );
 }
